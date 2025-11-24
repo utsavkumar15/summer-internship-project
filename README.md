@@ -1,1 +1,2 @@
-# summer-internship-project
+summer-internship-project
+N Queen Visualizer
