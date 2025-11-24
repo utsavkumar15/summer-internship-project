@@ -1,80 +1,54 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
 
-int isSafe(vector<vector<int>>& mat, 
-                    int row, int col) {
-    int n = mat.size();
-    int i, j;
-
-    
-    for (i = 0; i < row; i++)
-        if (mat[i][col])
-            return 0;
-
-    
-    for (i = row-1, j = col-1; i >= 0 && 
-         j >= 0; i--, j--)
-        if (mat[i][j])
-            return 0;
-
-    
-    for (i = row-1, j = col+1; j < n && 
-         i >= 0; i--, j++)
-        if (mat[i][j])
-            return 0;
-
-    return 1;
+void printSolution(const vector<vector<int>>& board) {
+    int n = board.size();
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << (board[i][j] == 1 ? "Q " : ". ");
+        }
+        cout << endl;
+    }
+    cout << endl;
 }
 
-int placeQueens(int row, vector<vector<int>>& mat) {
-    int n = mat.size();
-
-    
-    if(row == n) return 1;
-
-    
-    for(int i = 0; i < n; i++){
-
-        
-        if(isSafe(mat, row, i)){
-            mat[row][i] = 1;
-            if(placeQueens(row + 1, mat)) 
-                return 1;
-            mat[row][i] = 0;
-        }
-    }
-    return 0;
+bool isSafe(const vector<vector<int>>& board, int row, int col) {
+    int n = board.size();
+    for (int i = 0; i < col; i++)
+        if (board[row][i] == 1) return false;
+    for (int i = row, j = col; i >= 0 && j >= 0; i--, j--)
+        if (board[i][j] == 1) return false;
+    for (int i = row, j = col; j >= 0 && i < n; i++, j--)
+        if (board[i][j] == 1) return false;
+    return true;
 }
 
-// Function to find the solution
-// to the N-Queens problem
-vector<int> nQueen(int n) {
-
-    // Initialize the board
-    vector<vector<int>> mat(n, vector<int>(n, 0));
-
-    // If the solution exists
-    if(placeQueens(0, mat)){
-
-        // to store the columns of the queens
-        vector<int> ans;
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                if(mat[i][j]){
-                    ans.push_back(j + 1);
-                }
-            }
-        }
-        return ans;
+bool solveNQueensUtil(vector<vector<int>>& board, int col) {
+    int n = board.size();
+    if (col >= n) {
+        printSolution(board);
+        return true;
     }
-    else return {-1};
+    bool res = false;
+    for (int i = 0; i < n; i++) {
+        if (isSafe(board, i, col)) {
+            board[i][col] = 1;
+            res = solveNQueensUtil(board, col + 1) || res;
+            board[i][col] = 0;
+        }
+    }
+    return res;
+}
+
+void solveNQueens(int n) {
+    vector<vector<int>> board(n, vector<int>(n, 0));
+    if (!solveNQueensUtil(board, 0))
+        cout << "Solution does not exist for N = " << n << endl;
 }
 
 int main() {
-    int n = 4;
-    vector<int> ans = nQueen(n);
-    for(auto i: ans){
-        cout << i << " ";
-    }
+    int N = 4;
+    solveNQueens(N);
     return 0;
 }
